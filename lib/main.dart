@@ -5,6 +5,9 @@ import 'package:message_bottle/screen/home_screen.dart';
 // import 'firebase_options.dart';
 
 void main() {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(
     // const MyApp()
     MaterialApp(

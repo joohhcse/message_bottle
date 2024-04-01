@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:message_bottle/screen/msg_view_screen.dart';
+import 'package:message_bottle/screen/chatting_screen.dart';
+import 'package:message_bottle/screen/send_msg_screen.dart';
 import 'package:message_bottle/model/msg_model.dart';
 
 class MsgListScreen extends StatelessWidget {
@@ -14,7 +15,7 @@ class MsgListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Message List'),
+        title: Text('Screen 2 - Msg List'),
       ),
       body: ListView.builder(
         itemCount: messages.length,
@@ -25,7 +26,8 @@ class MsgListScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MsgViewScreen(message: messages[index]),
+                  // builder: (context) => SendMsgScreen(message: messages[index]),
+                  builder: (context) => ChattingScreen(),
                 ),
               );
             },

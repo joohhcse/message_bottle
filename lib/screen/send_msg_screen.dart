@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:message_bottle/model/msg_model.dart';
 
-class SendScreen extends StatefulWidget {
-  const SendScreen({super.key});
+class SendMsgScreen extends StatefulWidget {
+  const SendMsgScreen({super.key});
 
   @override
-  State<SendScreen> createState() => _SendScreenState();
+  State<SendMsgScreen> createState() => _SendMsgScreenState();
 }
 
-class _SendScreenState extends State<SendScreen> {
-
+class _SendMsgScreenState extends State<SendMsgScreen> {
   String? _radioValue = 'Option 1';
   TextEditingController _textEditingController = TextEditingController();
 
@@ -23,9 +24,9 @@ class _SendScreenState extends State<SendScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Demo'),
+        title: Text('Screen 1'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,12 +58,24 @@ class _SendScreenState extends State<SendScreen> {
             ),
             SizedBox(height: 20),
             Text('텍스트 입력:'),
-            TextField(
+            TextFormField(
               controller: _textEditingController,
               decoration: InputDecoration(
                 hintText: '텍스트를 입력하세요',
                 border: OutlineInputBorder(),
               ),
+              maxLines: 6,
+              maxLength: 120,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter(
+                  RegExp(r'^[a-zA-Zㄱ-ㅎ가-힣0-9\s]*$'),
+                  allow: true,
+                )
+              ],
             ),
             SizedBox(height: 20),
             Center(
@@ -76,5 +89,5 @@ class _SendScreenState extends State<SendScreen> {
       ),
     );
   }
-
 }
+

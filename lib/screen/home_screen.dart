@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:message_bottle/screen/msg_list_screen.dart';
 import 'package:message_bottle/screen/setting_screen.dart';
 import 'package:message_bottle/screen/send_msg_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
+import 'package:message_bottle/main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +24,44 @@ class _HomeScreenState extends State<HomeScreen> {
     MsgListScreen(),
     SettingScreen(),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    // final user = supabase.auth.currentUser;
+    // print("user > " + user.toString());
+
+    var uuid = Uuid();
+    var randomUUID = uuid.v4();
+
+    // if (user == null) {
+    //   final response = await supabase.auth.signUp(
+    //     email: randomUUID + '@gmail.com',//'email@example.com', // 사용자 이메일
+    //     password: 'q1w2e3r4', // 사용자 비밀번호
+    //     data: {'user_name': 'temp_user_name'},
+    //   );
+    //
+    //   // if (response.error == null) {
+    //   //   // 사용자 정보 저장 성공
+    //   //   print('User signed up successfully');
+    //   // } else {
+    //   //   // 사용자 정보 저장 실패
+    //   //   print('Error signing up: ${response.error!.message}');
+    //   // }
+    //
+    // } else {
+    //   // 이미 로그인한 사용자
+    //   print('User already signed up');
+    // }
+
+  }
+
+
 
   // @override
   // Widget build(BuildContext context) {

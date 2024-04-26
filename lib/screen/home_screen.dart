@@ -1,11 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:message_bottle/screen/msg_list_screen.dart';
 import 'package:message_bottle/screen/setting_screen.dart';
 import 'package:message_bottle/screen/send_msg_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 import 'package:message_bottle/main.dart';
+
+import '../utils/utils.dart';
+import 'login_screen.dart';
+import 'package:uuid/uuid.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,58 +23,47 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool isLoading = false; //not used
+
+  late SharedPreferences _prefs;
+
+  String generateRandomString(int length) {
+    var random = Random();
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    return List.generate(length, (index) => chars[random.nextInt(chars.length)]).join();
+  }
 
   final List<Widget> _children = [
     SendMsgScreen(),
     MsgListScreen(),
-    SettingScreen(),
+    // SettingScreen(),
   ];
+
+  Future<void> _loadThemeMode() async {
+    _prefs = await SharedPreferences.getInstance();
+    final String? savedThemeMode = _prefs.getString('themeMode');
+
+    if(savedThemeMode == null) {
+      HomeScreen.themeNotifier.value = ThemeMode.light;
+    } else if(savedThemeMode == "ThemeMode.light") {
+      HomeScreen.themeNotifier.value = ThemeMode.light;
+    } else if(savedThemeMode == "ThemeMode.dark") {
+      HomeScreen.themeNotifier.value = ThemeMode.dark;
+    }
+  }
+
+  Future<void> _saveThemeMode(ThemeMode themeMode) async {
+    _prefs = await SharedPreferences.getInstance();
+    _prefs.setString('themeMode', themeMode.toString());
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _load();
+    _loadUserId();  //userId Initialize
+    _loadThemeMode(); //dark mode
   }
 
-  Future<void> _load() async {
-    // final user = supabase.auth.currentUser;
-    // print("user > " + user.toString());
-
-    var uuid = Uuid();
-    var randomUUID = uuid.v4();
-
-    // if (user == null) {
-    //   final response = await supabase.auth.signUp(
-    //     email: randomUUID + '@gmail.com',//'email@example.com', // 사용자 이메일
-    //     password: 'q1w2e3r4', // 사용자 비밀번호
-    //     data: {'user_name': 'temp_user_name'},
-    //   );
-    //
-    //   // if (response.error == null) {
-    //   //   // 사용자 정보 저장 성공
-    //   //   print('User signed up successfully');
-    //   // } else {
-    //   //   // 사용자 정보 저장 실패
-    //   //   print('Error signing up: ${response.error!.message}');
-    //   // }
-    //
-    // } else {
-    //   // 이미 로그인한 사용자
-    //   print('User already signed up');
-    // }
-
-  }
-
-
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return MaterialApp(
-  //     // home: SendScreen(),
-  //     home: MsgListScreen(),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -93,12 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.list),
-                  label: '쪽지리스트',
+                  label: '받은쪽지리스트',
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: '설정',
-                ),
+                // BottomNavigationBarItem(
+                //   icon: Icon(Icons.settings),
+                //   label: '설정',
+                // ),
               ],
             ),
 
@@ -107,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
 
   void onTabTapped(int index) {
@@ -118,9 +113,97 @@ class _HomeScreenState extends State<HomeScreen> {
   // 앱이 종료될 때 SharedPreferences에 테마 모드를 저장
   @override
   void dispose() {
-    // _saveThemeMode(HomeScreen.themeNotifier.value);
+    _saveThemeMode(HomeScreen.themeNotifier.value);
     super.dispose();
   }
 
+  Future<void> _loadUserId() async {
+    print('========> loadUserId()');
+    _prefs = await SharedPreferences.getInstance();
+    String? userId = _prefs.getString('userId');
+
+    if(userId == null) {
+      userId = generateRandomString(10);
+      _prefs.setString('userId', userId);
+      insertUser(userId);
+    }
+    else {
+      print('_loadUserId : useId >>>' + userId);
+    }
+  }
+
+  Future<String?> selectUser(String userId) async {
+    try{
+      var response = await Supabase.instance.client
+          .from('users')
+          .select()
+          .eq('username', userId);
+
+      print('select User OK');
+      print(response.toString());
+      print('=======================');
+      return response.toString();
+
+    } on AuthException catch (error) {
+      print(' selectUser1 => ' + error.message);
+    } on Exception catch (error) {
+      print(' selectUser2 => ' + error.toString());
+    } finally {
+      setState(() {
+
+      });
+    }
+  }
+
+  Future<void> insertUser(String userId) async {
+    try{
+      final response = await Supabase.instance.client
+          .from('users')
+          .insert({'username': userId});
+    } on AuthException catch (error) {
+      print(' insertUser1 => ' + error.message);
+    } on Exception catch (error) {
+      print(' insertUser2 => ' + error.toString());
+    } finally {
+      setState(() {
+
+      });
+    }
+  }
+
+  //not used
+  Future<void> _signUp({
+    required String email,
+    required String userName,
+    required String password,
+  }) async {
+    // Set loading state to true
+    setState(() {
+      isLoading = true;
+      print('_signUp : isLoading is TRUE');
+    });
+
+    // Try to sign up with Supabase
+    try {
+      await Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+        data: {'username': userName},
+      );
+    } on AuthException catch (error) {
+      // Catch any errors with signing up
+      // showErrorSnackBar(context, message: error.message);
+      print(error.message);
+    } on Exception catch (error) {
+      // Catch any other errors
+      // showErrorSnackBar(context, message: error.toString());
+      print(error.toString());
+    } finally {
+      // Set loading state to false
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
 }

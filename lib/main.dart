@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:message_bottle/screen/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:message_bottle/screen/init_screen.dart';
 import 'package:message_bottle/screen/home_screen.dart';
 
 // import 'package:firebase_core/firebase_core.dart';
@@ -21,12 +21,6 @@ Future<void> main() async {
     anonKey: supabaseAnonKey.toString(),
   );
 
-  final supabase = Supabase.instance.client;
-
-  print('=============');
-  print(supabase);
-  print('=============');
-
   runApp(
     // const MyApp()
     MaterialApp(
@@ -34,3 +28,15 @@ Future<void> main() async {
     ),
   );
 }
+
+// Future<void> signUp(String email, String password) async {
+//   final response = await Supabase.instance.client.auth.signUp(
+//     email: 'user1@gmail.com',
+//     password: 'q1w2e3r4',
+//   );
+//   if (response.error == null) {
+//     // 가입 성공
+//   } else {
+//     // 가입 실패
+//   }
+// }

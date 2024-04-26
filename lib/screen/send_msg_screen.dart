@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:message_bottle/model/msg_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SendMsgScreen extends StatefulWidget {
   const SendMsgScreen({super.key});
@@ -12,56 +16,133 @@ class SendMsgScreen extends StatefulWidget {
 class _SendMsgScreenState extends State<SendMsgScreen> {
   String? _radioValue = 'Option 1';
   TextEditingController _textEditingController = TextEditingController();
+  late SharedPreferences _prefs;
+  late String _myUserId;
 
-  void _handleSubmit() {
-    // 전송 버튼 클릭 시 수행할 작업을 여기에 추가합니다.
-    print('전송 버튼이 클릭되었습니다.');
-    print('라디오 버튼 선택: $_radioValue');
-    print('텍스트 입력: ${_textEditingController.text}');
+  Future<void> _handleSubmit() async {
+
+    if(_textEditingController.text.length < 5) {
+      showToast("내용을 입력하세요.(5글자 이상)");
+      return;
+    }
+    
+    insertMessage(_myUserId, _textEditingController.text);
   }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId();
+  }
+
+  Future<void> _loadUserId() async {
+    print('========> loadUserId()');
+    _prefs = await SharedPreferences.getInstance();
+    String? userId = _prefs.getString('userId');
+
+    if(userId == null) {
+      print('sendMsgScreen > _loadUserId error >>> userId is null!!');
+    }
+    else {
+      print('sendMsgScreen > _loadUserId : useId >>>' + userId);
+      _myUserId = userId;
+    }
+  }
+
+  Future<void> insertMessage(String senderId, String content) async {
+    try{
+      // var response1 = await Supabase.instance.client
+      //     .from('users')
+      //     .select('user_id')
+      //     .order('RANDOM()')
+      //     .limit(1);
+
+      var countResponse = await Supabase.instance.client
+          .from('users')
+          .count(); // select count(*) from users
+      int rowCount = int.parse(countResponse.toString());
+      if(rowCount == 0) return;
+      int randomIndex = Random().nextInt(rowCount);
+      var response1 = await Supabase.instance.client
+          .from('users')
+          .select('username')
+          .limit(1)
+          .range(randomIndex, randomIndex);
+
+      if(senderId == response1[0]['username'].toString()) {
+        showToast("쪽지를 다시 전송해주세요.");
+        return;
+      }
+
+      final response2 = await Supabase.instance.client
+          .from('messages')
+          .insert({'sender_id': senderId, 'recipient_id':response1[0]['username'].toString(), 'content': content});
+    } on AuthException catch (error) {
+      print(' insertMessage 3 => ' + error.message);
+    } on Exception catch (error) {
+      print(' insertMessage 4 => ' + error.toString());
+    } finally {
+      showToast("쪽지를 전송했습니다.");
+      setState(() {
+
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Screen 1'),
-      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(12, 38, 12, 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('라디오 버튼 선택:'),
-            Row(
-              children: [
-                Radio(
-                  value: 'Option 1',
-                  groupValue: _radioValue,
-                  onChanged: (value) {
-                    setState(() {
-                      _radioValue = value;
-                    });
-                  },
-                ),
-                Text('Option 1'),
-                Radio(
-                  value: 'Option 2',
-                  groupValue: _radioValue,
-                  onChanged: (value) {
-                    setState(() {
-                      _radioValue = value;
-                    });
-                  },
-                ),
-                Text('Option 2'),
-              ],
+            Text(
+              '새로운 메시지 작성',
+              style: TextStyle(
+                fontSize: 20,
+              ),
             ),
+            // Row(
+            //   children: [
+            //     Radio(
+            //       value: 'Option 1',
+            //       groupValue: _radioValue,
+            //       onChanged: (value) {
+            //         setState(() {
+            //           _radioValue = value;
+            //         });
+            //       },
+            //     ),
+            //     Text('Option 1'),
+            //     Radio(
+            //       value: 'Option 2',
+            //       groupValue: _radioValue,
+            //       onChanged: (value) {
+            //         setState(() {
+            //           _radioValue = value;
+            //         });
+            //       },
+            //     ),
+            //     Text('Option 2'),
+            //
+            //     // ElevatedButton( //test
+            //     //     onPressed: () {
+            //     //       _showUsernameInputDialog(context);
+            //     //     },
+            //     //     child: Text('BTN'),
+            //     // )
+            //   ],
+            // ),
             SizedBox(height: 20),
-            Text('텍스트 입력:'),
             TextFormField(
               controller: _textEditingController,
               decoration: InputDecoration(
-                hintText: '텍스트를 입력하세요',
+                hintText: '상대에게 쪽지를 작성하세요. (5글자 이상)',
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                ),
                 border: OutlineInputBorder(),
               ),
               maxLines: 6,
@@ -72,7 +153,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
               ),
               inputFormatters: [
                 FilteringTextInputFormatter(
-                  RegExp(r'^[a-zA-Zㄱ-ㅎ가-힣0-9\s]*$'),
+                  RegExp(r'^[a-zA-Zㄱ-ㅎ가-힣0-9\s~!@#$%^&*()\[\]\-=_+\\;,./<>?:"{}|]*$'),
                   allow: true,
                 )
               ],
@@ -81,7 +162,10 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: _handleSubmit,
-                child: Text('전송'),
+                child: Text('전송하기'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.cyanAccent,
+                ),
               ),
             ),
           ],
@@ -89,5 +173,46 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
       ),
     );
   }
+
+  //toast message
+  void showToast(String msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  //not used // alert example
+  Future<void> _showUsernameInputDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter Username'),
+          content: TextField(
+            // onChanged: (value) {
+            //   usernameModel.updateUsername(value);
+            // },
+            decoration: InputDecoration(hintText: 'Username'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 

@@ -27,6 +27,7 @@ class MessageRepository {
     return messages;
   }
 
+  //not used
   Stream<List<Message>> getMyMessage2(String myId) {
     final messages = _client.from('messages')
         .stream(primaryKey: ['message_id'])
@@ -45,8 +46,14 @@ class MessageRepository {
   }
 
   Future deleteMessage(String uuid) async {
-    return await _client.from('messages').delete().eq('message_id', uuid);
+    return await _client.from('messages').update({
+      'is_delete': true
+    })
+    .eq('message_id', uuid,);
   }
+  // Future deleteMessage(String uuid) async {
+  //   return await _client.from('messages').delete().eq('message_id', uuid);
+  // }
 
 
 }

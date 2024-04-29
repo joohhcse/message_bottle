@@ -26,7 +26,12 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
       return;
     }
     
-    insertMessage(_myUserId, _textEditingController.text);
+    insertMessage(_myUserId, _textEditingController.text).then((value) {
+      _textEditingController.clear();
+      showToast("쪽지를 전송했습니다.");
+    }).catchError((e){
+      print(' _handleSubmit error => ' + e.toString());
+    });
   }
 
   @override
@@ -36,7 +41,6 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
   }
 
   Future<void> _loadUserId() async {
-    print('========> loadUserId()');
     _prefs = await SharedPreferences.getInstance();
     String? userId = _prefs.getString('userId');
 

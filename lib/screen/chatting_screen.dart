@@ -5,24 +5,26 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:message_bottle/model/message.dart';
 import 'package:message_bottle/model/message_repository.dart';
-
+import 'package:uuid/uuid.dart';
 
 class ChattingScreen extends StatefulWidget {
-  // final String message_id;
+  final String message_id;
   final String sender_id;
   final String recipient_id;
   final String content;
   final String time;
   final bool is_read;
+  final bool is_delete;
 
   const ChattingScreen({
     Key? key,
-    // required this.message_id,
+    required this.message_id,
     required this.sender_id,
     required this.recipient_id,
     required this.content,
     required this.time,
     required this.is_read,
+    required this.is_delete,
   }) : super(key: key);
 
   @override
@@ -31,23 +33,25 @@ class ChattingScreen extends StatefulWidget {
 
 class _ChattingScreenState extends State<ChattingScreen> {
   final MessageRepository _repository = MessageRepository();
-  // late String messageId;
+  late String messageId;
   late String senderId;
   late String recipientId;
   late String content;
   late String time;
   late bool isRead;
+  late bool isDelete;
   TextEditingController _returnTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // messageId = widget.message_id;
+    messageId = widget.message_id;
     senderId = widget.sender_id;
     recipientId = widget.recipient_id;
     content = widget.content;
     time = widget.time;
     isRead = widget.is_read;
+    isDelete = widget.is_delete;
   }
 
   Future<void> _returnSubmit() async {
@@ -57,7 +61,8 @@ class _ChattingScreenState extends State<ChattingScreen> {
       return;
     }
 
-    Message msg = Message(recipientId, senderId, _returnTextController.text, DateTime.now().toString(), false);
+    var uuid = Uuid();
+    Message msg = Message(uuid.v4(), recipientId, senderId, _returnTextController.text, DateTime.now().toString(), false, false);
     _repository.addMessage(msg).then((value) {
       _returnTextController.clear();
       showToast("쪽지를 전송했습니다.");

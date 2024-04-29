@@ -5,12 +5,14 @@ class BadUsers {
   final String username;
   final String report;
   final String time;
+  final String reporter;
 
   BadUsers(
       this.user_id,
       this.username,
       this.report,
       this.time,
+      this.reporter,
       );
 
   factory BadUsers.fromJson(Map<String,dynamic> json) => _$BadUsersFromJson(json);

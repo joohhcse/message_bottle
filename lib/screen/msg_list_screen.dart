@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MsgListScreen extends StatefulWidget {
   const MsgListScreen({super.key});
@@ -52,7 +54,7 @@ class _MsgListScreenState extends State<MsgListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '쪽지 리스트',
+          AppLocalizations.of(context)!.msg_list,
           style: TextStyle(
             fontSize: 20,
           ),
@@ -112,17 +114,16 @@ class _MsgListScreenState extends State<MsgListScreen> {
                           trailing: PopupMenuButton(
                             itemBuilder: (context) => [
                               PopupMenuItem(
-                                child: Text('신고하기'),
+                                child: Text(AppLocalizations.of(context)!.report),
                                 value: 'report',
                               ),
                               PopupMenuItem(
-                                child: Text('삭제하기'),
+                                child: Text(AppLocalizations.of(context)!.delete),
                                 value: 'delete',
                               ),
                             ],
                             onSelected: (value) {
                               if (value == 'report') {
-                                print('reportMessage >>>>>>>');
                                 var uuid = Uuid();
 
                                 BadUsers badUser = BadUsers(
@@ -134,15 +135,14 @@ class _MsgListScreenState extends State<MsgListScreen> {
                                 );
 
                                 _badUsersRepository.addBadUser(badUser).then((value) {
-                                  showToast("사용자를 신고했습니다.");
+                                  showToast(AppLocalizations.of(context)!.toast_user_report);
                                 }).catchError((e){
                                   print(' reportMessage error => ' + e.toString());
                                 });
 
                               } else if (value == 'delete') {
-                                print('deleteMessage >>>>>>>');
                                 _repository.deleteMessage(filteredMessages[index].message_id!).then((value){
-                                  showToast("메시지를 삭제했습니다.");
+                                  showToast(AppLocalizations.of(context)!.toast_msg_delete);
                                 }).catchError((e) {
                                   print(' deleteMessage error => ' + e.toString());
                                 });

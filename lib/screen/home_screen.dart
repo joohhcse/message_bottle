@@ -5,12 +5,9 @@ import 'package:message_bottle/screen/msg_list_screen.dart';
 import 'package:message_bottle/screen/setting_screen.dart';
 import 'package:message_bottle/screen/send_msg_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:message_bottle/main.dart';
-
-import '../utils/utils.dart';
-import 'login_screen.dart';
-import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,6 +72,17 @@ class _HomeScreenState extends State<HomeScreen> {
           themeMode: themeMode, // MaterialApp의 테마 모드를 themeNotifier의 값으로 설정합니다.
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ko', ''),
+            Locale('en', ''),
+            Locale('ja', ''),
+          ],
           home: Scaffold(
             body: _children[_currentIndex],
             bottomNavigationBar: BottomNavigationBar(
@@ -83,11 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.mark_chat_unread_outlined),
-                  label: '랜덤쪽지보내기',
+                  label: AppLocalizations.of(context)!.send_random_msg,
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.list),
-                  label: '받은쪽지리스트',
+                  label: AppLocalizations.of(context)!.msg_list, //'받은쪽지리스트',
                 ),
                 // BottomNavigationBarItem(
                 //   icon: Icon(Icons.settings),
@@ -118,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadUserId() async {
-    print('========> loadUserId()');
     _prefs = await SharedPreferences.getInstance();
     String? userId = _prefs.getString('userId');
 
@@ -139,9 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
           .select()
           .eq('username', userId);
 
-      print('select User OK');
-      print(response.toString());
-      print('=======================');
       return response.toString();
 
     } on AuthException catch (error) {

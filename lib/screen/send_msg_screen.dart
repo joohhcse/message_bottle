@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class SendMsgScreen extends StatefulWidget {
   const SendMsgScreen({super.key});
@@ -22,13 +24,13 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
   Future<void> _handleSubmit() async {
 
     if(_textEditingController.text.length < 5) {
-      showToast("내용을 입력하세요.(5글자 이상)");
+      showToast(AppLocalizations.of(context)!.toast_plz_enter_content); //내용을 입력하세요.(5글자 이상)
       return;
     }
     
     insertMessage(_myUserId, _textEditingController.text).then((value) {
       _textEditingController.clear();
-      showToast("쪽지를 전송했습니다.");
+      showToast(AppLocalizations.of(context)!.toast_sent_msg);  //쪽지를 전송했습니다.
     }).catchError((e){
       print(' _handleSubmit error => ' + e.toString());
     });
@@ -74,7 +76,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
           .range(randomIndex, randomIndex);
 
       if(senderId == response1[0]['username'].toString()) {
-        showToast("쪽지를 다시 전송해주세요.");
+        showToast(AppLocalizations.of(context)!.toast_plz_resend); //쪽지를 다시 전송해주세요.
         return;
       }
 
@@ -86,7 +88,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
     } on Exception catch (error) {
       print(' insertMessage 4 => ' + error.toString());
     } finally {
-      showToast("쪽지를 전송했습니다.");
+      showToast(AppLocalizations.of(context)!.toast_sent_msg);
       setState(() {
 
       });
@@ -102,12 +104,14 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Text(
-              '새로운 메시지 작성',
+            AppLocalizations.of(context)!.compose_new_msg, //'새로운 메시지 작성',
               style: TextStyle(
                 fontSize: 20,
               ),
             ),
+
             // Row(
             //   children: [
             //     Radio(
@@ -143,7 +147,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
             TextFormField(
               controller: _textEditingController,
               decoration: InputDecoration(
-                hintText: '상대에게 쪽지를 작성하세요. (5글자 이상)',
+                hintText: AppLocalizations.of(context)!.hint_compose_msg, //'hint compose msg',
                 hintStyle: TextStyle(
                   fontSize: 14,
                 ),
@@ -166,7 +170,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
             Center(
               child: ElevatedButton(
                 onPressed: _handleSubmit,
-                child: Text('전송하기'),
+                child: Text(AppLocalizations.of(context)!.send),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.cyanAccent,
                 ),

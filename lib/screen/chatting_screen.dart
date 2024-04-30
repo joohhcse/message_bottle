@@ -6,6 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:message_bottle/model/message.dart';
 import 'package:message_bottle/model/message_repository.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class ChattingScreen extends StatefulWidget {
   final String message_id;
@@ -57,7 +59,8 @@ class _ChattingScreenState extends State<ChattingScreen> {
   Future<void> _returnSubmit() async {
 
     if(_returnTextController.text.length < 5) {
-      showToast("내용을 입력하세요.(5글자 이상)");
+      showToast(AppLocalizations.of(context)!.toast_plz_enter_content);  //내용을 입력하세요.(5글자 이상)
+
       return;
     }
 
@@ -65,15 +68,10 @@ class _ChattingScreenState extends State<ChattingScreen> {
     Message msg = Message(uuid.v4(), recipientId, senderId, _returnTextController.text, DateTime.now().toString(), false, false);
     _repository.addMessage(msg).then((value) {
       _returnTextController.clear();
-      showToast("쪽지를 전송했습니다.");
+      showToast(AppLocalizations.of(context)!.toast_sent_msg);  //쪽지를 전송했습니다.
     }).catchError((e){
       print(' _returnSubmit error => ' + e.toString());
     });
-    // .whenComplete(() {
-    //   setState(() {
-    //   _isLoading = false;
-    //   });
-    // });
   }
 
   //toast message
@@ -93,7 +91,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('답장하기'),
+        title: Text(AppLocalizations.of(context)!.reply),  //답장하기
       ),
       // body: Text('ddd : $senderId'),
       body: SingleChildScrollView(
@@ -102,7 +100,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '보낸 사람 : $senderId',
+                AppLocalizations.of(context)!.sender + ' : $senderId',
                 style: TextStyle(
                   fontSize: 20,
                 ),
@@ -117,7 +115,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
               //   ),
               // ),
               Text(
-                '받은 내용 : ',
+                AppLocalizations.of(context)!.received_content + ' : ',
                 style: TextStyle(
                   fontSize: 20,
                 ),
@@ -156,7 +154,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
               TextFormField(
                 controller: _returnTextController,
                 decoration: InputDecoration(
-                  hintText: '상대에게 쪽지를 작성하세요.(5글자 이상)',
+                  hintText: AppLocalizations.of(context)!.hint_compose_msg,
                   hintStyle: TextStyle(
                     fontSize: 14,
                   ),
@@ -179,7 +177,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: _returnSubmit,
-                  child: Text('전송하기'),
+                  child: Text(AppLocalizations.of(context)!.send),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.cyanAccent,
                   ),

@@ -1,0 +1,21 @@
+{
+  "hello": "Hello",
+  "title": "Total Tally",
+  "setting": "Setting",
+  "send_random_msg": "Send Message",
+  "msg_list": "Message List",
+  "compose_new_msg": "Compose new message",
+  "send": "Send",
+  "reply": "Reply",
+  "send_reply": "Send reply :",
+  "report": "Report",
+  "delete": "Delete",
+  "sender": "Sender",
+  "received_content": "Received",
+  "hint_compose_msg": "Compose message to recipient. (5 characters or more)",
+  "toast_sent_msg": "Message sent.",
+  "toast_plz_enter_content": "Please enter content. (5 characters or more)",
+  "toast_plz_resend": "Please resend the message.",
+  "toast_user_report": "User has been reported.",
+  "toast_msg_delete": "Message has been deleted."
+}

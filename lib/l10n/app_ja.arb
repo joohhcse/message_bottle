@@ -1,0 +1,21 @@
+{
+  "hello": "こんにちは",
+  "title": "合計 計算機",
+  "setting": "設定",
+  "send_random_msg": "メッセージ送信",
+  "msg_list": "メッセージリスト",
+  "compose_new_msg": "新しいメッセージの作成",
+  "send": "転送する",
+  "reply": "返事する",
+  "send_reply": "返事する :",
+  "report": "申告する",
+  "delete": "削除する",
+  "sender": "相手",
+  "received_content": "受けた内容",
+  "hint_compose_msg": "相手にメッセージを作成してください。（5文字以上）",
+  "toast_send_msg": "メッセージを送りました。",
+  "toast_plz_enter_content": "内容を入力してください。（5文字以上）",
+  "toast_plz_resend": "メッセージをもう一度転送してください。",
+  "toast_user_report": "ユーザーを申告しました。",
+  "toast_msg_delete": "メッセージを削除しました。"
+}

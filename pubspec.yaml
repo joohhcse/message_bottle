@@ -2,7 +2,7 @@ name: message_bottle
 description: "A message bottle project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+2
+version: 1.0.0+3
 
 environment:
 #  sdk: '>=3.2.3 <4.0.0'
@@ -11,6 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
 
 #  google_mobile_ads: ^2.3.0 # 책: 코드팩토리 플러터 프로그래밍 # 주석처리
   #  google_mobile_ads: ^0.11.0+4
@@ -29,6 +33,7 @@ dependencies:
   uuid: ^3.0.7
   fluttertoast: ^8.0.8
 
+
 flutter_icons:
   android: true
   ios: true
@@ -44,7 +49,6 @@ flutter:
   assets:
     - assets/
     - .env
-
   uses-material-design: true
-
+  generate: true
 

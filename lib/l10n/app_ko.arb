@@ -1,0 +1,21 @@
+{
+  "hello": "안녕하세요",
+  "title": "쇼핑 계산기",
+  "setting": "설정",
+  "send_random_msg": "랜덤쪽지보내기",
+  "msg_list": "받은쪽지리스트",
+  "compose_new_msg": "새로운 쪽지 작성",
+  "send": "전송하기",
+  "reply": "답장하기 ",
+  "send_reply": "답장하기 :",
+  "report": "신고하기",
+  "delete": "삭제하기",
+  "sender": "보낸 사람",
+  "received_content": "받은 내용",
+  "hint_compose_msg": "상대에게 쪽지를 작성하세요.(5글자 이상)",
+  "toast_sent_msg": "쪽지를 전송했습니다.",
+  "toast_plz_enter_content": "내용을 입력하세요.(5글자 이상)",
+  "toast_plz_resend": "쪽지를 다시 전송해주세요.",
+  "toast_user_report": "사용자를 신고했습니다.",
+  "toast_msg_delete": "메시지를 삭제했습니다."
+}

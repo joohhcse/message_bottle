@@ -3,7 +3,12 @@
         android:label="message_bottle"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- admop id-->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4116817706973954~8445705226"/>
         <activity
+            android:label="랜덤쪽지"
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"

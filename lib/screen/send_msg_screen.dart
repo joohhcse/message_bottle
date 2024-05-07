@@ -7,6 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:message_bottle/banner_ad_widget.dart';
 
 class SendMsgScreen extends StatefulWidget {
   const SendMsgScreen({super.key});
@@ -104,7 +105,7 @@ class _SendMsgScreenState extends State<SendMsgScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
+            BannerAdWidget(), //admop
             Text(
             AppLocalizations.of(context)!.compose_new_msg, //'새로운 메시지 작성',
               style: TextStyle(

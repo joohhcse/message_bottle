@@ -11,6 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:message_bottle/banner_ad_widget.dart';
 
 class MsgListScreen extends StatefulWidget {
   const MsgListScreen({super.key});
@@ -60,123 +61,130 @@ class _MsgListScreenState extends State<MsgListScreen> {
           ),
         ),
       ),
-      body: StreamBuilder<List<Message>>(
-        stream: _repository.getMyMessage(myId),
-        builder: (context,snapshot) {
-          if(snapshot.hasData) {
-            // List<Message> messages = snapshot.data ?? [];
-            List<Message> messages = snapshot.data!.where((message) => !message.is_delete).toList();
+      body: Column(
+        children: [
+          BannerAdWidget(), //admop
+          Expanded(
+            child: StreamBuilder<List<Message>>(
+              stream: _repository.getMyMessage(myId),
+              builder: (context,snapshot) {
+                if(snapshot.hasData) {
+                  // List<Message> messages = snapshot.data ?? [];
+                  List<Message> messages = snapshot.data!.where((message) => !message.is_delete).toList();
 
-            return StreamBuilder<List<BadUsers>> (
-              stream: _badUsersRepository.getMyBadUsers(myId),
-              builder: (context, badUsersSnapshot) {
-                if(badUsersSnapshot.hasData) {
-                  List<String> listBadUsername = badUsersSnapshot.data!.map((badUsers) => badUsers.username).toList();
+                  return StreamBuilder<List<BadUsers>> (
+                      stream: _badUsersRepository.getMyBadUsers(myId),
+                      builder: (context, badUsersSnapshot) {
+                        if(badUsersSnapshot.hasData) {
+                          List<String> listBadUsername = badUsersSnapshot.data!.map((badUsers) => badUsers.username).toList();
 
-                  List<Message> filteredMessages = snapshot.data!
-                      .where((message) =>
-                  !message.is_delete &&
-                      !listBadUsername.contains(message.sender_id))
-                      .toList();
+                          List<Message> filteredMessages = snapshot.data!
+                              .where((message) =>
+                          !message.is_delete &&
+                              !listBadUsername.contains(message.sender_id))
+                              .toList();
 
-                  if(filteredMessages.length == 0) {
-                    return const Center(child: Text('empty message list!'),);
-                  }
+                          if(filteredMessages.length == 0) {
+                            return const Center(child: Text('Empty message list!'),);
+                          }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    itemCount: filteredMessages.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        elevation: 4, // 카드의 그림자 효과 설정
-                        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // 카드의 외부 여백 설정
-                        child: ListTile(
-                          // leading: Text(messages[index].sender_id),
-                          leading: Text(filteredMessages[index].sender_id, style: TextStyle(color: Colors.black38),),
-                          title: Text(filteredMessages[index].content),
-                          minLeadingWidth: 100,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChattingScreen(
-                                  message_id: filteredMessages[index].message_id,
-                                  sender_id: filteredMessages[index].sender_id,
-                                  recipient_id: filteredMessages[index].recipient_id,
-                                  content: filteredMessages[index].content,
-                                  time: filteredMessages[index].time,
-                                  is_read: filteredMessages[index].is_read,
-                                  is_delete: filteredMessages[index].is_delete,
+                          return ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            itemCount: filteredMessages.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                elevation: 4, // 카드의 그림자 효과 설정
+                                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16), // 카드의 외부 여백 설정
+                                child: ListTile(
+                                  // leading: Text(messages[index].sender_id),
+                                  leading: Text(filteredMessages[index].sender_id, style: TextStyle(color: Colors.black38),),
+                                  title: Text(filteredMessages[index].content),
+                                  minLeadingWidth: 100,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChattingScreen(
+                                          message_id: filteredMessages[index].message_id,
+                                          sender_id: filteredMessages[index].sender_id,
+                                          recipient_id: filteredMessages[index].recipient_id,
+                                          content: filteredMessages[index].content,
+                                          time: filteredMessages[index].time,
+                                          is_read: filteredMessages[index].is_read,
+                                          is_delete: filteredMessages[index].is_delete,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  trailing: PopupMenuButton(
+                                    itemBuilder: (context) => [
+                                      PopupMenuItem(
+                                        child: Text(AppLocalizations.of(context)!.report),
+                                        value: 'report',
+                                      ),
+                                      PopupMenuItem(
+                                        child: Text(AppLocalizations.of(context)!.delete),
+                                        value: 'delete',
+                                      ),
+                                    ],
+                                    onSelected: (value) {
+                                      if (value == 'report') {
+                                        var uuid = Uuid();
+
+                                        BadUsers badUser = BadUsers(
+                                            uuid.v4(),
+                                            filteredMessages[index].sender_id,
+                                            'clicked report button',
+                                            DateTime.now().toString(),
+                                            filteredMessages[index].recipient_id
+                                        );
+
+                                        _badUsersRepository.addBadUser(badUser).then((value) {
+                                          showToast(AppLocalizations.of(context)!.toast_user_report);
+                                        }).catchError((e){
+                                          print(' reportMessage error => ' + e.toString());
+                                        });
+
+                                      } else if (value == 'delete') {
+                                        _repository.deleteMessage(filteredMessages[index].message_id!).then((value){
+                                          showToast(AppLocalizations.of(context)!.toast_msg_delete);
+                                        }).catchError((e) {
+                                          print(' deleteMessage error => ' + e.toString());
+                                        });
+                                      }
+                                    },
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          trailing: PopupMenuButton(
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                child: Text(AppLocalizations.of(context)!.report),
-                                value: 'report',
-                              ),
-                              PopupMenuItem(
-                                child: Text(AppLocalizations.of(context)!.delete),
-                                value: 'delete',
-                              ),
-                            ],
-                            onSelected: (value) {
-                              if (value == 'report') {
-                                var uuid = Uuid();
-
-                                BadUsers badUser = BadUsers(
-                                  uuid.v4(),
-                                  filteredMessages[index].sender_id,
-                                  'clicked report button',
-                                  DateTime.now().toString(),
-                                  filteredMessages[index].recipient_id
-                                );
-
-                                _badUsersRepository.addBadUser(badUser).then((value) {
-                                  showToast(AppLocalizations.of(context)!.toast_user_report);
-                                }).catchError((e){
-                                  print(' reportMessage error => ' + e.toString());
-                                });
-
-                              } else if (value == 'delete') {
-                                _repository.deleteMessage(filteredMessages[index].message_id!).then((value){
-                                  showToast(AppLocalizations.of(context)!.toast_msg_delete);
-                                }).catchError((e) {
-                                  print(' deleteMessage error => ' + e.toString());
-                                });
-                              }
+                              );
                             },
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        }
+                        else if (badUsersSnapshot.hasError) {
+                          return Text('Error: List<BadUsers>');
+                        }
+                        else if (badUsersSnapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator(),);
+                        }
+
+                        return const Center(child: Text('Loading...'),);
+                      }
                   );
+
+
                 }
-                else if (badUsersSnapshot.hasError) {
-                  return Text('Error: List<BadUsers>');
+                else if(snapshot.hasError) {
+                  return const Center(child: Text('Something wrong'),);
                 }
-                else if (badUsersSnapshot.connectionState == ConnectionState.waiting) {
+                else if(snapshot.connectionState == ConnectionState.waiting) {
                   return CircularProgressIndicator();
                 }
 
                 return const Center(child: Text('Loading...'),);
-              }
-            );
-
-
-          }
-          else if(snapshot.hasError) {
-            return const Center(child: Text('Something wrong'),);
-          }
-          else if(snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
-          }
-
-          return const Center(child: Text('Loading...'),);
-        },
-      ),
+              },
+            ),
+          )
+        ],
+      )
     );
   }
 

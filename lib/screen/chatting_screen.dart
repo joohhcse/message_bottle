@@ -166,12 +166,12 @@ class _ChattingScreenState extends State<ChattingScreen> {
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter(
-                    RegExp(r'^[a-zA-Zㄱ-ㅎ가-힣0-9\s~!@#$%^&*()\[\]\-=_+\\;,./<>?:"{}|]*$'),
-                    allow: true,
-                  )
-                ],
+                // inputFormatters: [
+                //   FilteringTextInputFormatter(
+                //     RegExp(r'^[a-zA-Zㄱ-ㅎ가-힣0-9\s~!@#$%^&*()\[\]\-=_+\\;,./<>?:"{}|]*$'),
+                //     allow: true,
+                //   )
+                // ],
               ),
               SizedBox(height: 20),
               Center(
